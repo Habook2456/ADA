@@ -41,7 +41,7 @@ public:
 
         vector<bool> visited(numVertices, false);
         vector<int> distances(numVertices, INT_MAX);
-        deque<deque<int>> padre(numVertices, deque<int>(1,start));
+        deque<deque<int>> padre(numVertices, deque<int>(1, start));
         pq.push(make_pair(0, start));
         distances[start] = 0;
 
@@ -66,11 +66,10 @@ public:
                 {
                     distances[destVertex] = distances[currentVertex] + weight;
                     pq.push(make_pair(distances[destVertex], destVertex));
-                    padre[destVertex].push_front(currentVertex);
-                }
-                else if (visited[destVertex] == false && distances[currentVertex] + weight == distances[destVertex])
-                {
-                    padre[destVertex].push_front(currentVertex);
+                    if (!(find(padre[destVertex].begin(), padre[destVertex].end(), currentVertex) != padre[destVertex].end()) && distances[currentVertex] + weight == distances[destVertex])
+                    {
+                        padre[destVertex].push_back(currentVertex);
+                    }
                 }
             }
         }
@@ -79,7 +78,6 @@ public:
         {
             std::cout << "distancia " << start << " hacia " << i << ": " << distances[i] << std::endl;
         }
-
 
         for (int i = 0; i < numVertices; i++)
         {
