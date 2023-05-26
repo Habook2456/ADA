@@ -4,6 +4,7 @@
 #include <queue>
 #include <algorithm>
 #include <climits>
+#include <deque>
 using namespace std;
 
 class graph
@@ -40,9 +41,10 @@ public:
 
         vector<bool> visited(numVertices, false);
         vector<int> distances(numVertices, INT_MAX);
-        vector<vector<int>> padre(numVertices);
+        deque<deque<int>> padre(numVertices, deque<int>(1,start));
         pq.push(make_pair(0, start));
         distances[start] = 0;
+
         while (!pq.empty())
         {
             int currentVertex = pq.top().second;
@@ -63,9 +65,12 @@ public:
                 if (visited[destVertex] == false && distances[currentVertex] + weight < distances[destVertex])
                 {
                     distances[destVertex] = distances[currentVertex] + weight;
-                    padre[destVertex].push_back(currentVertex);
-                    // std::cout << "padre de " << destVertex << " es " << currentVertex << std::endl;
                     pq.push(make_pair(distances[destVertex], destVertex));
+                    padre[destVertex].push_front(currentVertex);
+                }
+                else if (visited[destVertex] == false && distances[currentVertex] + weight == distances[destVertex])
+                {
+                    padre[destVertex].push_front(currentVertex);
                 }
             }
         }
@@ -75,13 +80,26 @@ public:
             std::cout << "distancia " << start << " hacia " << i << ": " << distances[i] << std::endl;
         }
 
-        for (int i = 0; i < padre.size(); i++)
+
+        for (int i = 0; i < numVertices; i++)
         {
-            std::cout << "padre " << i << "\n";
-            for (int j = 0; j < padre[i].size(); j++)
+            cout << i << " -> ";
+            if (!padre[i].empty())
             {
-                std::cout << padre[i].size() << std::endl;
+                for (int j = padre[i].size() - 1; j >= 0; j--)
+                {
+                    cout << padre[i][j];
+                    if (j > 0)
+                    {
+                        cout << " -> ";
+                    }
+                }
             }
+            else
+            {
+                cout << "No hay camino";
+            }
+            cout << endl;
         }
     }
 
