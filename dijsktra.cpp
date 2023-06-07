@@ -49,7 +49,6 @@ public:
         {
             int currentVertex = pq.top().second;
             pq.pop();
-            // std::cout << currentVertex << " -> ";
             if (visited[currentVertex])
             {
                 continue;
@@ -126,6 +125,6 @@ int main()
     initGraph(g);
     g.printGraph();
     std::cout << "\nDijkstra Algorithm\n";
-    g.dijkstra(0);
+    g.dijkstra(4);
     return 0;
 }
