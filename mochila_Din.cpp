@@ -76,10 +76,10 @@ void knapsack(vector<pair<int, int>> objects, int maxWeight)
 
 int main()
 {
-    vector<int> peso = {2, 3, 4};
-    vector<int> beneficio = {1, 2, 5};
+    vector<int> peso = {1, 2, 5, 6, 7};
+    vector<int> beneficio = {1, 6, 18, 22, 28};
     vector<pair<int, int>> objetos = makeObjetos(peso, beneficio);
-    int pesoMaximo = 6;
+    int pesoMaximo = 11;
 
     knapsack(objetos, pesoMaximo);
     
