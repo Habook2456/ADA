@@ -125,6 +125,6 @@ int main()
     initGraph(g);
     g.printGraph();
     std::cout << "\nDijkstra Algorithm\n";
-    g.dijkstra(4);
+    g.dijkstra(0);
     return 0;
 }
