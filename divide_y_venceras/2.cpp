@@ -71,3 +71,15 @@ int main()
 
     return 0;
 }
+
+/*
+
+
+2. Modifique el algoritmo "divide y vencerás" para la multiplicación de grandes
+enteros de forma que permita multiplicar números en binario. Ilustre el
+funcionamiento del algoritmo a la hora de multiplicar los siguientes enteros:
+A = 10011011 y B = 10111010.
+
+
+
+*/
