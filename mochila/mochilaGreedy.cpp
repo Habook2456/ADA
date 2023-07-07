@@ -5,19 +5,16 @@
 using namespace std;
 using std::cout;
 
-int main()
+vector<int> mochilaGreedy(vector<int> peso, vector<int> beneficio, int pesoMaximoMochila)
 {
-    vector<int> peso = {2,190};
-    vector<int> beneficio = {1,100};
-    int pesoMaximoMochila = 100;
-    int objetos = 2;
-    vector<int> x(objetos, 0);
+
+    int objetos = peso.size();
+    vector<int> solucion(objetos, 0);
     int pesoActual = 0;
     int objetoActual = 0;
 
     for (int i = 0; i < objetos; i++)
     {
-        // x[i] = 0;
         while (pesoActual < pesoMaximoMochila)
         {
             // eleccion mejor beneficio
@@ -27,28 +24,40 @@ int main()
             auto pesoActualIter = min_element(peso.begin(), peso.end());
             int pos = distance(peso.begin(), pesoActualIter);
 
-            cout << "pos: " << pos << endl;
             if (pesoActual + peso[pos] <= pesoMaximoMochila)
             {
-                x[pos] = 1;
+                solucion[pos] = 1;
                 pesoActual += peso[pos];
             }
             else
             {
-                x[pos] = (pesoMaximoMochila - pesoActual) / peso[pos];
+                solucion[pos] = (pesoMaximoMochila - pesoActual) / peso[pos];
                 pesoActual = pesoMaximoMochila;
             }
-            cout << pesoActual << endl;
-            peso[pos] = INT_MAX;
-            beneficio[pos] = INT_MAX;
+            peso[pos] = INT_MAX;      // modificar
+            beneficio[pos] = INT_MAX; // modificar
         }
     }
 
-    for (int i = 0; i < x.size(); i++)
+    return solucion;
+}
+
+int main()
+{
+    vector<int> peso = {1, 2, 5, 6, 7};
+    vector<int> beneficio = {1, 6, 18, 22, 28};
+    int pesoMaximoMochila = 13;
+
+    vector<int> solucion = mochilaGreedy(peso, beneficio, pesoMaximoMochila);
+
+    cout << "Items en Mochila" << endl;
+    for (int i = 0; i < solucion.size(); i++)
     {
-        cout << x[i] << " ";
+        if (solucion[i] == 1)
+        {
+            cout << "item " << i + 1 << ": peso -> " << peso[i] << " | beneficio -> " << beneficio[i] << endl;
+        }
     }
-    cout << endl;
 
     return 0;
 }
