@@ -1,94 +1,129 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
-#include <climits>
+#include <limits>
 
-// Estructura para representar un cliente con su vector de características
-struct Customer {
-    std::vector<double> features;
+using namespace std;
+
+// Estructura para representar un cliente con sus características
+struct Cliente {
+    vector<double> caracteristicas;
 };
 
-// Función para calcular la distancia euclídea entre dos vectores de características
-double calculateDistance(const std::vector<double>& features1, const std::vector<double>& features2) {
-    int n = features1.size();
-    double distance = 0.0;
-
-    for (int i = 0; i < n; i++) {
-        distance += std::pow(features1[i] - features2[i], 2);
+// Función para calcular la distancia entre dos clientes
+double calcularDistancia(const Cliente& c1, const Cliente& c2) {
+    double distancia = 0.0;
+    for (size_t i = 0; i < c1.caracteristicas.size(); ++i) {
+        double dif = c1.caracteristicas[i] - c2.caracteristicas[i];
+        distancia += dif * dif;
     }
-
-    return std::sqrt(distance);
+    return sqrt(distancia);
 }
 
-// Función para agrupar clientes maximizando la distancia entre grupos
-std::vector<std::vector<Customer>> groupCustomers(const std::vector<Customer>& customers, int K) {
-    int n = customers.size();
-    int numFeatures = customers[0].features.size();
+// Función para encontrar el cliente más cercano a un grupo dado
+int encontrarClienteMasCercano(const vector<Cliente>& clientes, const vector<Cliente>& grupo) {
+    int indiceMasCercano = -1;
+    double maxDistancia = -1.0;
 
-    // Inicializar K grupos vacíos
-    std::vector<std::vector<Customer>> groups(K);
+    for (size_t i = 0; i < clientes.size(); ++i) {
+        const Cliente& cliente = clientes[i];
+        double minDistancia = numeric_limits<double>::max();
 
-    // Asignar cada cliente al grupo más lejano
-    for (const auto& customer : customers) {
-        int groupIndex = 0;
-        double maxDistance = INT_MIN;
-
-        for (int i = 0; i < K; i++) {
-            double groupDistance = 0.0;
-
-            // Calcular la distancia promedio entre el cliente y los clientes del grupo
-            if (!groups[i].empty()) {
-                for (const auto& c : groups[i]) {
-                    groupDistance += calculateDistance(customer.features, c.features);
-                }
-                groupDistance /= groups[i].size();
-            }
-
-            // Actualizar el grupo más lejano
-            if (groupDistance > maxDistance) {
-                maxDistance = groupDistance;
-                groupIndex = i;
+        for (const Cliente& grupoCliente : grupo) {
+            double distancia = calcularDistancia(cliente, grupoCliente);
+            if (distancia < minDistancia) {
+                minDistancia = distancia;
             }
         }
 
-        // Asignar el cliente al grupo más lejano
-        groups[groupIndex].push_back(customer);
+        if (minDistancia > maxDistancia) {
+            maxDistancia = minDistancia;
+            indiceMasCercano = i;
+        }
     }
 
-    return groups;
+    return indiceMasCercano;
+}
+
+// Función para agrupar clientes en K grupos maximizando la distancia entre ellos
+vector<vector<Cliente>> agruparClientes(const vector<Cliente>& clientes, int K) {
+    vector<vector<Cliente>> grupos(K);
+    int numClientes = clientes.size();
+
+    // Añadir el primer cliente a un grupo inicial
+    grupos[0].push_back(clientes[0]);
+
+    // Iterar para añadir el resto de los clientes a los grupos
+    for (int i = 1; i < numClientes; ++i) {
+        // Encontrar el grupo más cercano al cliente actual
+        int indiceGrupoMasCercano = -1;
+        double maxDistancia = -1.0;
+
+        for (int j = 0; j < K; ++j) {
+            const vector<Cliente>& grupo = grupos[j];
+            double distancia = 0.0;
+
+            for (const Cliente& grupoCliente : grupo) {
+                distancia += calcularDistancia(clientes[i], grupoCliente);
+            }
+
+            distancia /= grupo.size();  // Promedio de las distancias al grupo
+
+            if (distancia > maxDistancia) {
+                maxDistancia = distancia;
+                indiceGrupoMasCercano = j;
+            }
+        }
+
+        // Añadir el cliente al grupo más cercano
+        grupos[indiceGrupoMasCercano].push_back(clientes[i]);
+    }
+
+    return grupos;
+}
+
+// Función auxiliar para imprimir los grupos de clientes
+void imprimirGrupos(const vector<vector<Cliente>>& grupos) {
+    int numGrupos = grupos.size();
+
+    for (int i = 0; i < numGrupos; ++i) {
+        cout << "Grupo " << i + 1 << ":" << endl;
+
+        const vector<Cliente>& grupo = grupos[i];
+        int numClientes = grupo.size();
+
+        for (int j = 0; j < numClientes; ++j) {
+            const Cliente& cliente = grupo[j];
+            cout << "Cliente " << j + 1 << ": ";
+            for (double caracteristica : cliente.caracteristicas) {
+                cout << caracteristica << " ";
+            }
+            cout << endl;
+        }
+
+        cout << endl;
+    }
 }
 
 int main() {
-    // Ejemplo de clientes con sus vectores de características
-    std::vector<Customer> customers = {
-        {{1.0, 2.0}},
-        {{2.0, 3.0}},
-        {{5.0, 6.0}},
-        {{7.0, 8.0}},
-        {{9.0, 10.0}},
-        {{12.0, 14.0}}
+    // Ejemplo de uso
+    vector<Cliente> clientes = {
+        {{1.0, 2.0, 3.0}},
+        {{4.0, 5.0, 6.0}},
+        {{7.0, 8.0, 9.0}},
+        {{2.0, 4.0, 6.0}},
+        {{1.0, 3.0, 5.0}},
+        {{6.0, 4.0, 2.0}}
     };
 
-    int K = 2;  // Número de grupos
+    int K = 3;  // Número de grupos deseados
 
-    // Agrupar clientes maximizando la distancia entre grupos
-    std::vector<std::vector<Customer>> groups = groupCustomers(customers, K);
-
-    // Imprimir los grupos resultantes
-    for (int i = 0; i < K; i++) {
-        std::cout << "Grupo " << i+1 << ":" << std::endl;
-        for (const auto& customer : groups[i]) {
-            std::cout << "(";
-            for (double feature : customer.features) {
-                std::cout << feature << " ";
-            }
-            std::cout << ")" << std::endl;
-        }
-        std::cout << std::endl;
-    }
+    vector<vector<Cliente>> grupos = agruparClientes(clientes, K);
+    imprimirGrupos(grupos);
 
     return 0;
 }
+
 
 /*
 

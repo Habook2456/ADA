@@ -34,16 +34,16 @@ int main()
         alphabetIndex[alphabet[i]] = i;
     }
 
-    char u = 'b';
-    char v = 'd';
+    char u = 'd';
+    char v = 'c';
 
     if (precedes(u, v, alphabet, alphabetIndex))
     {
-        cout << u << " precede a " << v << " en el orden Φ." << endl;
+        cout << u << " precede a " << v << endl;
     }
     else
     {
-        cout << u << " no precede a " << v << " en el orden Φ." << endl;
+        cout << u << " no precede a " << v << endl;
     }
 
     return 0;

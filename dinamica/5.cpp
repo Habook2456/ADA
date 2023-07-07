@@ -1,60 +1,62 @@
 #include <iostream>
 #include <vector>
-#include <algorithm>
+#include <cmath>
 #include <limits>
 
-using namespace std;
+const double INF = std::numeric_limits<double>::infinity();
 
-const int INF = numeric_limits<int>::max();
+double calculateDistance(std::pair<int, int> p1, std::pair<int, int> p2) {
+    int dx = p1.first - p2.first;
+    int dy = p1.second - p2.second;
+    return std::sqrt(dx*dx + dy*dy);
+}
 
-int tsp(vector<vector<int>>& graph, int n) {
-    vector<vector<int>> dp(n, vector<int>(1 << n, INF));
-
-    // Caso base: si S es vacío y estamos en el nodo 0, la distancia es 0
-    dp[0][0] = 0;
-
-    // Calcular las distancias mínimas utilizando programación dinámica con subconjuntos
-    for (int mask = 1; mask < (1 << n); mask++) {
-        for (int i = 0; i < n; i++) {
-            if ((mask & (1 << i)) != 0) {  // Si el nodo i está en el subconjunto representado por el mask
-                for (int j = 0; j < n; j++) {
-                    if (i != j && (mask & (1 << j)) != 0) {  // Si el nodo j también está en el subconjunto
-                        dp[i][mask] = min(dp[i][mask], graph[i][j] + dp[j][mask ^ (1 << i)]);
+double tsp(std::vector<std::pair<int, int>>& points) {
+    int n = points.size();
+    int numSubsets = 1 << n; // 2^n
+    std::vector<std::vector<double>> dp(n, std::vector<double>(numSubsets, INF));
+    
+    dp[0][1] = 0;
+    
+    for (int subset = 1; subset < numSubsets; ++subset) {
+        for (int last = 0; last < n; ++last) {
+            if ((subset & (1 << last)) != 0) {
+                if (subset == (1 << last)) {
+                    continue;
+                }
+                for (int curr = 0; curr < n; ++curr) {
+                    if ((subset & (1 << curr)) != 0 && curr != last) {
+                        int prevSubset = subset ^ (1 << last);
+                        dp[last][subset] = std::min(dp[last][subset], dp[curr][prevSubset] + calculateDistance(points[curr], points[last]));
                     }
                 }
             }
         }
     }
-
-    // Encontrar la distancia mínima del camino hamiltoniano
-    int minDist = INF;
-    for (int i = 1; i < n; i++) {
-        minDist = min(minDist, graph[i][0] + dp[i][(1 << n) - 1]);
+    
+    double minDist = INF;
+    int finalSubset = (1 << n) - 1;
+    for (int last = 1; last < n; ++last) {
+        minDist = std::min(minDist, dp[last][finalSubset] + calculateDistance(points[last], points[0]));
     }
-
+    
     return minDist;
 }
 
 int main() {
-    int n;
-    cout << "Ingrese el número de nodos: ";
-    cin >> n;
-
-    vector<vector<int>> graph(n, vector<int>(n));
-
-    cout << "Ingrese las distancias entre los nodos: " << endl;
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
-            cin >> graph[i][j];
-        }
+    std::vector<std::pair<int, int>> points = {{0, 0}, {1, 1}, {3, 3}, {2, 2}};
+    double minDistance = tsp(points);
+    
+    if (minDistance == INF) {
+        std::cout << "No se encontró una solución válida." << std::endl;
+    } else {
+        std::cout << "La distancia mínima del TSP es: " << minDistance << std::endl;
     }
-
-    int minDist = tsp(graph, n);
-
-    cout << "La longitud del camino más corto del problema del viajante de comercio es: " << minDist << endl;
-
+    
     return 0;
 }
+
+
 
 /*5. Problema del viajante de comercio
 Diseñe un algoritmo basado en programación dinámica para resolver el

@@ -71,23 +71,12 @@ double calcularProbabilidadC(int n, double PL, double PV) {
 }
 
 int main() {
-    int n;
-    double P, PL, PV;
-
-    cout << "Ingrese el número de victorias requeridas para ganar el playoff (n): ";
-    cin >> n;
-
-    cout << "Ingrese la probabilidad de que Informáticos CB gane un partido (P): ";
-    cin >> P;
+    int n = 10;
+    double P = 0.5, PL = 0.7, PV = 0.3;
+    
 
     cout << "a. Probabilidad de que Informáticos CB gane el playoff (caso a): "
          << calcularProbabilidadA(n, P) << endl;
-
-    cout << "Ingrese la probabilidad de que Informáticos CB gane como local (PL): ";
-    cin >> PL;
-
-    cout << "Ingrese la probabilidad de que Informáticos CB gane como visitante (PV): ";
-    cin >> PV;
 
     cout << "b. Influencia de la ventaja de campo: "
          << calcularProbabilidadB(n, PL, PV) << endl;

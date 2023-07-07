@@ -1,55 +1,58 @@
 #include <iostream>
 #include <vector>
-#include <algorithm>
+#include <climits>
 
-// Estructura para representar una asignación de tarea a trabajador
-struct Assignment {
-    int worker;
-    int task;
-    int cost;
-};
+using namespace std;
 
-// Función para asignar tareas a trabajadores utilizando la estrategia aleatoria
-std::vector<Assignment> assignTasksRandomly(int n, const std::vector<std::vector<int>>& costs) {
-    std::vector<int> tasks(n);
-    std::vector<Assignment> assignments;
+// Función para encontrar la asignación óptima utilizando el algoritmo greedy
+vector<pair<int, int>> asignacionGreedy(vector<vector<int>>& costos) {
+    int n = costos.size();
+    vector<bool> trabajadorAsignado(n, false); // Marcar si el trabajador i ha sido asignado
+    vector<pair<int, int>> asignacion; // Lista de pares (trabajador, tarea) asignados
 
-    // Inicializar el vector de tareas
-    for (int i = 0; i < n; i++) {
-        tasks[i] = i;
+    // Iterar sobre todas las tareas
+    for (int tarea = 0; tarea < n; tarea++) {
+        int minCosto = INT_MAX;
+        int mejorTrabajador;
+
+        // Encontrar el trabajador disponible con el menor costo para la tarea actual
+        for (int trabajador = 0; trabajador < n; trabajador++) {
+            if (!trabajadorAsignado[trabajador] && costos[trabajador][tarea] < minCosto) {
+                minCosto = costos[trabajador][tarea];
+                mejorTrabajador = trabajador;
+            }
+        }
+
+        // Asignar la tarea al trabajador seleccionado
+        asignacion.push_back(make_pair(mejorTrabajador, tarea));
+        trabajadorAsignado[mejorTrabajador] = true;
     }
 
-    // Asignar aleatoriamente las tareas a los trabajadores
-    std::random_shuffle(tasks.begin(), tasks.end());
+    return asignacion;
+}
 
-    // Construir el vector de asignaciones
-    for (int i = 0; i < n; i++) {
-        Assignment assignment;
-        assignment.worker = i;
-        assignment.task = tasks[i];
-        assignment.cost = costs[i][tasks[i]];
-        assignments.push_back(assignment);
+// Función auxiliar para imprimir la asignación
+void imprimirAsignacion(const vector<pair<int, int>>& asignacion) {
+    for (const auto& par : asignacion) {
+        cout << "Trabajador " << par.first << " -> Tarea " << par.second << endl;
     }
-
-    return assignments;
 }
 
 int main() {
-    int n = 4; // Número de trabajadores y tareas
-    std::vector<std::vector<int>> costs = {{5, 2, 6, 1}, {3, 7, 2, 5}, {1, 3, 9, 4}, {8, 2, 3, 6}};
+    int n = 3;
 
-    // Asignar tareas aleatoriamente a los trabajadores
-    std::vector<Assignment> assignments = assignTasksRandomly(n, costs);
+    vector<vector<int>> costos = {{4,1,6},{7,4,2},{3,6,1}};
 
-    // Imprimir las asignaciones y sus costes
-    std::cout << "Asignaciones:\n";
-    for (const auto& assignment : assignments) {
-        std::cout << "Trabajador " << assignment.worker << " -> Tarea " << assignment.task
-                  << " (Coste: " << assignment.cost << ")\n";
-    }
+
+    vector<pair<int, int>> asignacion = asignacionGreedy(costos);
+
+    cout << "Asignación óptima:" << endl;
+    imprimirAsignacion(asignacion);
 
     return 0;
 }
+
+
 
 /*6. Supongamos que disponemos de n trabajadores y n tareas. Sea cij > 0 el coste de
 asignarle el trabajo j al trabajador i. Una asignación válida es aquélla en la que a

@@ -1,3 +1,4 @@
+/*a*/
 #include <iostream>
 #include <vector>
 #include <algorithm>
@@ -7,11 +8,11 @@ struct Cliente {
     int tiempo;
 };
 
-bool compararPropinas(const Cliente& c1, const Cliente& c2) {
-    return (1.0 / c1.tiempo) > (1.0 / c2.tiempo);
+bool compararPropina(const Cliente& cliente1, const Cliente& cliente2) {
+    return (1.0 / cliente1.tiempo) > (1.0 / cliente2.tiempo);
 }
 
-void maximizarGananciasCamarero(const std::vector<int>& tiempos) {
+std::vector<int> maximizarGanancias(const std::vector<int>& tiempos) {
     int n = tiempos.size();
 
     std::vector<Cliente> clientes;
@@ -22,27 +23,91 @@ void maximizarGananciasCamarero(const std::vector<int>& tiempos) {
         clientes.push_back(cliente);
     }
 
-    // Ordenar los clientes por propina potencial (tiempo de espera inverso)
-    std::sort(clientes.begin(), clientes.end(), compararPropinas);
+    std::sort(clientes.begin(), clientes.end(), compararPropina);
 
-    // Atender a los clientes y calcular las ganancias
-    int ganancias = 0;
+    std::vector<int> solucion;
     for (int i = 0; i < n; i++) {
-        int propina = 1.0 / clientes[i].tiempo;
-        ganancias += propina;
-        std::cout << "Camarero atiende al cliente " << clientes[i].id << " (Tiempo: " << clientes[i].tiempo << ", Propina: " << propina << ")" << std::endl;
+        solucion.push_back(clientes[i].id);
     }
 
-    std::cout << "Ganancias totales del camarero: " << ganancias << std::endl;
+    return solucion;
 }
 
 int main() {
-    std::vector<int> tiempos = {5, 3, 8, 2, 6};
-    maximizarGananciasCamarero(tiempos);
+    std::vector<int> tiempos = {5, 3, 8, 2, 7};
+    std::vector<int> solucion = maximizarGanancias(tiempos);
+
+    std::cout << "Orden óptimo para maximizar las ganancias: ";
+    for (int cliente : solucion) {
+        std::cout << cliente << " ";
+    }
+    std::cout << std::endl;
 
     return 0;
 }
 
+/*b*/
+/*
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <queue>
+
+struct Cliente {
+    int id;
+    int tiempo;
+};
+
+bool compararPropina(const Cliente& cliente1, const Cliente& cliente2) {
+    return (1.0 / cliente1.tiempo) > (1.0 / cliente2.tiempo);
+}
+
+std::vector<int> maximizarGanancias(int k, const std::vector<int>& tiempos) {
+    int n = tiempos.size();
+
+    std::vector<Cliente> clientes;
+    for (int i = 0; i < n; i++) {
+        Cliente cliente;
+        cliente.id = i + 1;
+        cliente.tiempo = tiempos[i];
+        clientes.push_back(cliente);
+    }
+
+    std::sort(clientes.begin(), clientes.end(), compararPropina);
+
+    std::vector<int> solucion;
+    std::priority_queue<int, std::vector<int>, std::greater<int>> camareros;
+
+    for (int i = 0; i < k; i++) {
+        camareros.push(0); // Inicializar los tiempos de espera de los camareros en 0
+    }
+
+    for (int i = 0; i < n; i++) {
+        int tiempoEspera = camareros.top();
+        camareros.pop();
+
+        solucion.push_back(clientes[i].id);
+        camareros.push(tiempoEspera + clientes[i].tiempo);
+    }
+
+    return solucion;
+}
+
+int main() {
+    int k = 2; // Número de camareros
+    std::vector<int> tiempos = {5, 3, 8, 2, 7};
+    std::vector<int> solucion = maximizarGanancias(k, tiempos);
+
+    std::cout << "Orden óptimo para maximizar las ganancias con " << k << " camarero(s): ";
+    for (int cliente : solucion) {
+        std::cout << cliente << " ";
+    }
+    std::cout << std::endl;
+
+    return 0;
+}
+
+*/
 
 /*
 5. Supongamos que un único camarero debe atender a n clientes de un restaurante

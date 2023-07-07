@@ -2,34 +2,31 @@
 #include <vector>
 #include <algorithm>
 
-using namespace std;
-
 struct Task {
     int id;
     int deadline;
-    int profit;
+    int benefit;
+
+    Task(int i, int d, int b) : id(i), deadline(d), benefit(b) {}
 };
 
-bool compareTasks(const Task& task1, const Task& task2) {
-    return task1.profit > task2.profit; // Ordenar en orden no creciente de beneficio
+bool compareByBenefit(const Task& t1, const Task& t2) {
+    return t1.benefit > t2.benefit;
 }
 
-vector<Task> selectTasks(vector<Task>& tasks) {
-    sort(tasks.begin(), tasks.end(), compareTasks); // Ordenar las tareas por beneficio
+std::vector<int> selectTasks(int n, std::vector<Task>& tasks) {
+    std::sort(tasks.begin(), tasks.end(), compareByBenefit);
 
-    vector<Task> selectedTasks;
-    vector<bool> slot(tasks.size(), false); // Marcador para controlar los slots de tiempo ocupados
+    std::vector<int> selectedTasks;
+    std::vector<bool> slotOccupied(n + 1, false);
 
-    for (int i = 0; i < tasks.size(); i++) {
-        int currentSlot = min(tasks[i].deadline - 1, static_cast<int>(tasks.size()) - 1); // Encontrar el último slot disponible para la tarea
-
-        while (currentSlot >= 0 && slot[currentSlot]) { // Buscar un slot disponible en orden inverso
-            currentSlot--;
-        }
-
-        if (currentSlot >= 0) {
-            selectedTasks.push_back(tasks[i]); // Agregar la tarea al conjunto seleccionado
-            slot[currentSlot] = true; // Marcar el slot como ocupado
+    for (const Task& task : tasks) {
+        for (int i = task.deadline; i > 0; i--) {
+            if (!slotOccupied[i]) {
+                selectedTasks.push_back(task.id);
+                slotOccupied[i] = true;
+                break;
+            }
         }
     }
 
@@ -37,32 +34,26 @@ vector<Task> selectTasks(vector<Task>& tasks) {
 }
 
 int main() {
-    int n;
-    cout << "Ingrese la cantidad de tareas: ";
-    cin >> n;
+    int n = 4;
 
-    vector<Task> tasks(n);
+    std::vector<Task> tasks;
+    tasks.emplace_back(1, 2, 50);
+    tasks.emplace_back(2, 1, 10);
+    tasks.emplace_back(3, 2, 15);
+    tasks.emplace_back(4, 1, 30);
 
-    cout << "Ingrese los beneficios y plazos límite de las tareas:\n";
-    for (int i = 0; i < n; i++) {
-        tasks[i].id = i + 1;
-        cout << "Tarea " << tasks[i].id << ":\n";
-        cout << "Beneficio: ";
-        cin >> tasks[i].profit;
-        cout << "Plazo límite: ";
-        cin >> tasks[i].deadline;
+    std::vector<int> selectedTasks = selectTasks(n, tasks);
+
+    std::cout << "Conjunto de tareas seleccionadas: ";
+    for (int taskId : selectedTasks) {
+        std::cout << taskId << " ";
     }
-
-    vector<Task> selectedTasks = selectTasks(tasks);
-
-    cout << "\nEl conjunto de tareas seleccionado es:\n";
-    cout << "Tarea\tBeneficio\tPlazo límite\n";
-    for (const Task& task : selectedTasks) {
-        cout << task.id << "\t" << task.profit << "\t\t" << task.deadline << endl;
-    }
+    std::cout << std::endl;
 
     return 0;
 }
+
+
 /*
 3. Tenemos que completar un conjunto de n tareas con plazos límite. Cada una de
 las tareas consume la misma cantidad de tiempo (una unidad) y, en un instante

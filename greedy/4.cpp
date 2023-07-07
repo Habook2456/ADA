@@ -2,23 +2,24 @@
 #include <vector>
 #include <unordered_set>
 
-using namespace std;
-
 struct Edge {
     int u;
     int v;
+
+    Edge(int vertexU, int vertexV) : u(vertexU), v(vertexV) {}
 };
 
-vector<int> greedyCover(vector<Edge>& edges, int n) {
-    vector<int> cover;
-    vector<bool> selected(n, false);
+std::unordered_set<int> findMinimalCover(const std::vector<Edge>& edges) {
+    std::unordered_set<int> cover;
+    std::unordered_set<int> coveredVertices;
 
     for (const Edge& edge : edges) {
-        if (!selected[edge.u] && !selected[edge.v]) {
-            selected[edge.u] = true;
-            selected[edge.v] = true;
-            cover.push_back(edge.u);
-            cover.push_back(edge.v);
+        if (coveredVertices.find(edge.u) == coveredVertices.end() &&
+            coveredVertices.find(edge.v) == coveredVertices.end()) {
+            cover.insert(edge.u);
+            cover.insert(edge.v);
+            coveredVertices.insert(edge.u);
+            coveredVertices.insert(edge.v);
         }
     }
 
@@ -26,29 +27,36 @@ vector<int> greedyCover(vector<Edge>& edges, int n) {
 }
 
 int main() {
-    int n, m;
-    cout << "Ingrese el número de nodos (V): ";
-    cin >> n;
-    cout << "Ingrese el número de aristas (E): ";
-    cin >> m;
+    std::vector<Edge> edges;
+    edges.emplace_back(1, 2);
+    edges.emplace_back(1, 3);
+    edges.emplace_back(2, 3);
+    edges.emplace_back(2, 4);
+    edges.emplace_back(2, 5);
+    edges.emplace_back(3, 4);
+    edges.emplace_back(4, 5);
+    edges.emplace_back(4, 6);
+    edges.emplace_back(5, 6);
+    edges.emplace_back(5, 7);
+    edges.emplace_back(6, 7);
+    edges.emplace_back(6, 8);
+    edges.emplace_back(6, 9);
+    edges.emplace_back(7, 8);
+    edges.emplace_back(8, 9);
+    edges.emplace_back(8, 10);
+    edges.emplace_back(9, 10);
 
-    vector<Edge> edges(m);
-    cout << "Ingrese las aristas del grafo (u v):\n";
-    for (int i = 0; i < m; i++) {
-        cin >> edges[i].u >> edges[i].v;
+    std::unordered_set<int> minimalCover = findMinimalCover(edges);
+
+    std::cout << "Recubrimiento minimal: ";
+    for (int vertex : minimalCover) {
+        std::cout << vertex << " ";
     }
-
-    vector<int> cover = greedyCover(edges, n);
-
-    cout << "\nEl recubrimiento obtenido es: ";
-    unordered_set<int> coverSet(cover.begin(), cover.end());
-    for (int node : coverSet) {
-        cout << node << " ";
-    }
-    cout << endl;
+    std::cout << std::endl;
 
     return 0;
 }
+
 
 /*
 
